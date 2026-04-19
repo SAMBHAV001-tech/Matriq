@@ -1,6 +1,6 @@
 # Matriq – Smart Inventory Analytics System
 
-**Live Frontend (Vercel):** [Replace with Vercel Link]  
+**Live Frontend (Vercel):** [https://matriq.vercel.app](https://matriq.vercel.app)  
 **Live Backend API (Hugging Face Spaces):** [https://huggingface.co/spaces/SamD444/matriq-backend-api](https://huggingface.co/spaces/SamD444/matriq-backend-api)
 
 ---
