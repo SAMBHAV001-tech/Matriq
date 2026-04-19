@@ -148,11 +148,7 @@ Deployed normally via the Vercel GitHub integration focusing explicitly on build
 ### Swagger API Docs
 ![Swagger API Docs](docs/screenshots/swagger-docs.png)
 
-### Hugging Face Backend Live API
-![Hugging Face Backend](docs/screenshots/hf-backend.png)
 
-### Vercel Frontend Live App
-![Vercel Frontend](docs/screenshots/vercel-frontend.png)
 
 ---
 
