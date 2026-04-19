@@ -1,7 +1,6 @@
 # Matriq – Smart Inventory Analytics System
 
-**Live Frontend (Vercel):** [https://matriq.vercel.app](https://matriq.vercel.app)  
-**Live Backend API (Hugging Face Spaces):** [https://huggingface.co/spaces/SamD444/matriq-backend-api](https://huggingface.co/spaces/SamD444/matriq-backend-api)
+> 🚀 **Live Demo:** [matriq.vercel.app](https://matriq.vercel.app)
 
 ---
 
@@ -81,6 +80,11 @@ Relational schemas powered by PostgreSQL:
 - The FastAPI backend is packaged in a Docker container and deployed serverlessly on **Hugging Face Spaces**.
 - The frontend is served globally via edge networks using **Vercel**.
 - Database uses **Supabase PostgreSQL** cloud instances.
+
+| Service | URL |
+|---|---|
+| 🖥️ Frontend (Vercel) | [matriq.vercel.app](https://matriq.vercel.app) |
+| ⚙️ Backend API (Hugging Face) | [spaces/SamD444/matriq-backend-api](https://huggingface.co/spaces/SamD444/matriq-backend-api) |
 
 ---
 
