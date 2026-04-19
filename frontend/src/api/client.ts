@@ -1,5 +1,24 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
+/** 
+ * Rapidly polls /health until the HF Spaces backend is alive.
+ * Uses short intervals (1.5s) so cold-start wake time is minimised.
+ * Gives up after 60 attempts (~90s) to avoid infinite loops.
+ */
+export const wakeBackend = async (attempt = 0): Promise<void> => {
+    if (attempt >= 60) return;  // give up after ~90s
+    try {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), 5000); // 5s per probe
+        const res = await fetch(`${BASE_URL}/health`, { signal: controller.signal });
+        clearTimeout(id);
+        if (res.ok) return; // ✅ backend is awake
+    } catch {
+        // fetch failed or timed out — keep retrying
+    }
+    await new Promise(r => setTimeout(r, 1500)); // 1.5s gap between probes
+    return wakeBackend(attempt + 1);
+};
 export class ApiError extends Error {
     constructor(
         public status: number,
