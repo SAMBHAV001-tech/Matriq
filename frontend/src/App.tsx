@@ -45,7 +45,7 @@ function App() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 800);
 
-        fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'}/health`, {
+        fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://SamD444-matriq-backend-api.hf.space'}/health`, {
             signal: controller.signal,
         })
             .then((res) => {
