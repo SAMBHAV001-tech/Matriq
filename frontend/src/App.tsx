@@ -50,12 +50,18 @@ function App() {
         })
             .then((res) => {
                 clearTimeout(timeoutId);
-                if (!res.ok) setIsWaking(true);
+                if (res.ok) {
+                    // Backend responded fast and healthy — no banner needed
+                    setIsWaking(false);
+                } else {
+                    // Backend responded but unhealthy — show banner and keep polling
+                    setIsWaking(true);
+                    wakeBackend().then(() => setIsWaking(false));
+                }
             })
             .catch(() => {
-                // Timed out or failed → backend is sleeping, show warmup banner
+                // Timed out or failed → backend is cold/sleeping, show warmup banner
                 setIsWaking(true);
-                // wakeBackend already looping; when it resolves, hide banner
                 wakeBackend().then(() => setIsWaking(false));
             });
 
