@@ -22,23 +22,23 @@ export const seedApi = {
 };
 
 export const materialsApi = {
-    getAll: () => api.get<Material[]>('/materials'),
+    getAll: () => api.get<Material[]>('/materials/'),
 };
 
 export const vendorsApi = {
-    getAll: () => api.get<Vendor[]>('/vendors'),
+    getAll: () => api.get<Vendor[]>('/vendors/'),
 };
 
 export const plantsApi = {
-    getAll: () => api.get<Plant[]>('/plants'),
+    getAll: () => api.get<Plant[]>('/plants/'),
 };
 
 export const inventoryApi = {
-    getAll: () => api.get<InventoryRecord[]>('/inventory'),
+    getAll: () => api.get<InventoryRecord[]>('/inventory/'),
     create: (record: Partial<InventoryRecord>) =>
-        api.post<InventoryRecord>('/inventory', record),
+        api.post<InventoryRecord>('/inventory/', record),
     update: (id: string, record: Partial<InventoryRecord>) =>
-        api.patch<InventoryRecord>(`/inventory/${id}`, record),
+        api.patch<InventoryRecord>(`/inventory/${id}/`, record),
 };
 
 export const reportsApi = {
