@@ -1,5 +1,4 @@
-import { useEffect, useRef } from 'react';
-import { useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { ToastProvider } from './context/ToastContext';
 import { NavigationProvider, useNavigation } from './context/NavigationContext';
 import { AppShell } from './components/layout/AppShell';
@@ -14,16 +13,11 @@ import { wakeBackend } from './api/client';
 // This ensures the HF Spaces container starts warming ASAP
 wakeBackend();
 
-function DashboardContent({ isWaking }: { isWaking: boolean }) {
+function DashboardContent({ isWaking, refreshKey, onRefresh }: { isWaking: boolean; refreshKey: number; onRefresh: () => void }) {
     const { activeView } = useNavigation();
-    const [refreshKey, setRefreshKey] = useState(0);
-
-    const handleRefresh = useCallback(() => {
-        setRefreshKey((k) => k + 1);
-    }, []);
 
     return (
-        <AppShell onRefresh={handleRefresh} isWaking={isWaking}>
+        <AppShell onRefresh={onRefresh} isWaking={isWaking}>
             {activeView === 'overview' && <Overview refreshKey={refreshKey} />}
             {activeView === 'alv-report' && <ALVReport refreshKey={refreshKey} />}
             {activeView === 'alerts' && <AlertsView refreshKey={refreshKey} />}
@@ -34,35 +28,45 @@ function DashboardContent({ isWaking }: { isWaking: boolean }) {
 }
 
 function App() {
-    const [isWaking, setIsWaking] = useState(false);
+    // Start as true — hold off all data fetches until backend confirmed alive
+    const [isWaking, setIsWaking] = useState(true);
+    const [refreshKey, setRefreshKey] = useState(0);
     const checkedRef = useRef(false);
+
+    const handleRefresh = useCallback(() => {
+        setRefreshKey((k) => k + 1);
+    }, []);
 
     useEffect(() => {
         if (checkedRef.current) return;
         checkedRef.current = true;
 
-        // Quick probe: if /health doesn't respond in 800ms, backend is cold → show banner
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 800);
+        const BASE = import.meta.env.VITE_API_BASE_URL || 'https://SamD444-matriq-backend-api.hf.space';
 
-        fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://SamD444-matriq-backend-api.hf.space'}/health`, {
-            signal: controller.signal,
-        })
+        // Quick probe: if /health responds within 2s, backend is already up
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
+
+        fetch(`${BASE}/health`, { signal: controller.signal })
             .then((res) => {
                 clearTimeout(timeoutId);
                 if (res.ok) {
-                    // Backend responded fast and healthy — no banner needed
+                    // Backend up — allow views to load & trigger first data fetch
                     setIsWaking(false);
+                    setRefreshKey((k) => k + 1);
                 } else {
-                    // Backend responded but unhealthy — show banner and keep polling
-                    setIsWaking(true);
-                    wakeBackend().then(() => setIsWaking(false));
+                    wakeBackend().then(() => {
+                        setIsWaking(false);
+                        setRefreshKey((k) => k + 1);
+                    });
                 }
             })
             .catch(() => {
-                // Timed out or failed → backend is cold/sleeping, show warmup banner
-                setIsWaking(true);
-                wakeBackend().then(() => setIsWaking(false));
+                // Timed out or failed → backend cold, keep waking
+                wakeBackend().then(() => {
+                    setIsWaking(false);
+                    setRefreshKey((k) => k + 1);
+                });
             });
 
         return () => controller.abort();
@@ -71,7 +75,7 @@ function App() {
     return (
         <ToastProvider>
             <NavigationProvider>
-                <DashboardContent isWaking={isWaking} />
+                <DashboardContent isWaking={isWaking} refreshKey={refreshKey} onRefresh={handleRefresh} />
             </NavigationProvider>
         </ToastProvider>
     );
