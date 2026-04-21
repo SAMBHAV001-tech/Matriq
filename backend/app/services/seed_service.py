@@ -11,9 +11,17 @@ from ..models.alert import Alert
 router = APIRouter()
 
 @router.post("/seed", tags=["Seed"])
-def seed_database(db: Session = Depends(get_db)):
-    if db.query(Material).first():
-        return {"message": "Database already seeded."}
+def seed_database(db: Session = Depends(get_db), force: bool = False):
+    if db.query(Material).first() and not force:
+        return {"message": "Database already seeded. Use ?force=true to reseed."}
+
+    if force:
+        db.query(Alert).delete()
+        db.query(InventoryRecord).delete()
+        db.query(Material).delete()
+        db.query(Vendor).delete()
+        db.query(Plant).delete()
+        db.commit()
 
     # Realistic Seed Data
     materials = [
@@ -50,16 +58,18 @@ def seed_database(db: Session = Depends(get_db)):
 
     now = datetime.now()
     
-    # Mix of statuses
+    # Inventory records for ALL 10 materials — mix of statuses
     records = [
-        # Healthy
-        InventoryRecord(material_id=materials[0].id, vendor_id=vendors[0].id, plant_id=plants[0].id, storage_location="SLOC-01", current_stock=600, monthly_consumption=200, last_gr_date=now - timedelta(days=10)),
-        # Out of Stock
-        InventoryRecord(material_id=materials[1].id, vendor_id=vendors[1].id, plant_id=plants[1].id, storage_location="SLOC-02", current_stock=0, monthly_consumption=500, last_gr_date=now - timedelta(days=120)),
-        # Low
-        InventoryRecord(material_id=materials[2].id, vendor_id=vendors[2].id, plant_id=plants[0].id, storage_location="SLOC-01", current_stock=180, monthly_consumption=100, last_gr_date=now - timedelta(days=45)),
-        # Critical
-        InventoryRecord(material_id=materials[5].id, vendor_id=vendors[1].id, plant_id=plants[1].id, storage_location="SLOC-E1", current_stock=40, monthly_consumption=80, last_gr_date=now - timedelta(days=60)),
+        InventoryRecord(material_id=materials[0].id, vendor_id=vendors[0].id, plant_id=plants[0].id, storage_location="SLOC-01", current_stock=600,  monthly_consumption=200, last_gr_date=now - timedelta(days=10)),   # Healthy
+        InventoryRecord(material_id=materials[1].id, vendor_id=vendors[1].id, plant_id=plants[1].id, storage_location="SLOC-02", current_stock=0,    monthly_consumption=500, last_gr_date=now - timedelta(days=120)),  # Out of Stock
+        InventoryRecord(material_id=materials[2].id, vendor_id=vendors[2].id, plant_id=plants[0].id, storage_location="SLOC-01", current_stock=180,  monthly_consumption=100, last_gr_date=now - timedelta(days=45)),   # Low
+        InventoryRecord(material_id=materials[3].id, vendor_id=vendors[3].id, plant_id=plants[0].id, storage_location="SLOC-03", current_stock=6500, monthly_consumption=1000, last_gr_date=now - timedelta(days=5)),   # Healthy
+        InventoryRecord(material_id=materials[4].id, vendor_id=vendors[4].id, plant_id=plants[1].id, storage_location="SLOC-04", current_stock=200,  monthly_consumption=300, last_gr_date=now - timedelta(days=20)),   # Low
+        InventoryRecord(material_id=materials[5].id, vendor_id=vendors[1].id, plant_id=plants[1].id, storage_location="SLOC-E1", current_stock=40,   monthly_consumption=80,  last_gr_date=now - timedelta(days=60)),   # Critical
+        InventoryRecord(material_id=materials[6].id, vendor_id=vendors[0].id, plant_id=plants[0].id, storage_location="SLOC-05", current_stock=0,    monthly_consumption=20,  last_gr_date=now - timedelta(days=90)),   # Out of Stock
+        InventoryRecord(material_id=materials[7].id, vendor_id=vendors[2].id, plant_id=plants[0].id, storage_location="SLOC-06", current_stock=400,  monthly_consumption=80,  last_gr_date=now - timedelta(days=15)),   # Healthy
+        InventoryRecord(material_id=materials[8].id, vendor_id=vendors[1].id, plant_id=plants[1].id, storage_location="SLOC-E2", current_stock=30,   monthly_consumption=40,  last_gr_date=now - timedelta(days=50)),   # Critical
+        InventoryRecord(material_id=materials[9].id, vendor_id=vendors[0].id, plant_id=plants[0].id, storage_location="SLOC-07", current_stock=220,  monthly_consumption=60,  last_gr_date=now - timedelta(days=8)),    # Healthy
     ]
     db.add_all(records)
     db.commit()
