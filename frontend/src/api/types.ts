@@ -1,23 +1,26 @@
 export interface Material {
-    id: string;
-    code: string;
-    name: string;
-    group: string;
+    id: number;
+    material_code: string;
+    material_name: string;
+    material_group: string;
     unit_price: number;
-    unit_of_measure?: string;
+    base_unit?: string;
+    reorder_level?: number;
 }
 
 export interface Vendor {
-    id: string;
-    code: string;
-    name: string;
+    id: number;
+    vendor_code: string;
+    vendor_name: string;
+    city?: string;
     country?: string;
+    rating?: number;
 }
 
 export interface Plant {
-    id: string;
-    code: string;
-    name: string;
+    id: number;
+    plant_code: string;
+    plant_name: string;
     location?: string;
 }
 

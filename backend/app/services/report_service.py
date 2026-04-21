@@ -41,6 +41,7 @@ def generate_alv_report(
         risk = get_risk_score(record, material, vendor)
 
         report.append({
+            "material_id": material.id,
             "material_code": material.material_code,
             "material_name": material.material_name,
             "material_group": material.material_group,
@@ -56,8 +57,8 @@ def generate_alv_report(
             "last_gr_date": record.last_gr_date,
             "stock_status": status,
             "recommended_reorder_qty": reorder_qty,
-            "risk_score": risk["score"],
-            "risk_label": risk["label"]
+            "risk_score": risk["risk_score"],
+            "risk_label": risk["risk_label"]
         })
         
     return report
@@ -73,11 +74,11 @@ def generate_alv_summary(db: Session):
         material = db.query(Material).filter(Material.id == record.material_id).first()
         if material:
             status = get_stock_status(record.current_stock, material.reorder_level)
-            if status == "OUT_OF_STOCK":
+            if status == "out_of_stock":
                 out_of_stock += 1
-            elif status == "CRITICAL":
+            elif status == "critical":
                 critical += 1
-            elif status == "LOW":
+            elif status == "low":
                 low += 1
             else:
                 healthy += 1

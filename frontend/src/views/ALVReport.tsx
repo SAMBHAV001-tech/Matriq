@@ -193,7 +193,7 @@ export function ALVReport({ refreshKey }: ALVReportProps) {
                 >
                     <option value="">All Plants</option>
                     {plants.map((p) => (
-                        <option key={p.id} value={p.code}>{p.code} – {p.name}</option>
+                        <option key={p.id} value={p.plant_code}>{p.plant_code} – {p.plant_name}</option>
                     ))}
                 </select>
 
@@ -204,7 +204,7 @@ export function ALVReport({ refreshKey }: ALVReportProps) {
                 >
                     <option value="">All Vendors</option>
                     {vendors.map((v) => (
-                        <option key={v.id} value={v.code}>{v.code} – {v.name}</option>
+                        <option key={v.id} value={v.vendor_code}>{v.vendor_code} – {v.vendor_name}</option>
                     ))}
                 </select>
 

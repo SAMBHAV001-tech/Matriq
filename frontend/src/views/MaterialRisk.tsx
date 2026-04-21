@@ -135,7 +135,7 @@ function FactorRow({ factor }: { factor: ContributingFactor }) {
 
 export function MaterialRisk({ refreshKey }: MaterialRiskProps) {
     const [materials, setMaterials] = useState<Material[]>([]);
-    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
     const [riskData, setRiskData] = useState<MaterialRiskType | null>(null);
     const [loadingMaterials, setLoadingMaterials] = useState(true);
     const [loadingRisk, setLoadingRisk] = useState(false);
@@ -156,12 +156,12 @@ export function MaterialRisk({ refreshKey }: MaterialRiskProps) {
         }
     }, []);
 
-    const loadRisk = useCallback(async (id: string) => {
+    const loadRisk = useCallback(async (id: number) => {
         setLoadingRisk(true);
         setRiskError(null);
         setRiskData(null);
         try {
-            const data = await analyticsApi.getMaterialRisk(id);
+            const data = await analyticsApi.getMaterialRisk(String(id));
             setRiskData(data);
         } catch (e) {
             setRiskError(e instanceof Error ? e.message : 'Failed to load risk analysis');
@@ -172,7 +172,7 @@ export function MaterialRisk({ refreshKey }: MaterialRiskProps) {
 
     useEffect(() => { loadMaterials(); }, [loadMaterials, refreshKey]);
 
-    const handleSelect = (id: string) => {
+    const handleSelect = (id: number) => {
         setSelectedId(id);
         loadRisk(id);
     };
@@ -180,9 +180,9 @@ export function MaterialRisk({ refreshKey }: MaterialRiskProps) {
     const filteredMaterials = search
         ? materials.filter(
             (m) =>
-                m.name?.toLowerCase().includes(search.toLowerCase()) ||
-                m.code?.toLowerCase().includes(search.toLowerCase()) ||
-                m.group?.toLowerCase().includes(search.toLowerCase())
+                m.material_name?.toLowerCase().includes(search.toLowerCase()) ||
+                m.material_code?.toLowerCase().includes(search.toLowerCase()) ||
+                m.material_group?.toLowerCase().includes(search.toLowerCase())
         )
         : materials;
 
@@ -227,8 +227,8 @@ export function MaterialRisk({ refreshKey }: MaterialRiskProps) {
                                         }`}
                                 >
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-xs font-medium truncate text-slate-200">{mat.name}</div>
-                                        <div className="text-[10px] text-slate-500 font-mono">{mat.code}</div>
+                                        <div className="text-xs font-medium truncate text-slate-200">{mat.material_name}</div>
+                                        <div className="text-[10px] text-slate-500 font-mono">{mat.material_code}</div>
                                     </div>
                                     {selectedId === mat.id && <ChevronRight className="w-3 h-3 text-sky-400 shrink-0" />}
                                 </button>
@@ -268,10 +268,10 @@ export function MaterialRisk({ refreshKey }: MaterialRiskProps) {
                                         Risk Assessment
                                     </div>
                                     <div className="text-lg font-bold text-slate-100 mb-1">
-                                        {selectedMaterial?.name ?? riskData.material_name ?? 'Material'}
+                                        {selectedMaterial?.material_name ?? riskData.material_name ?? 'Material'}
                                     </div>
                                     <div className="text-xs font-mono text-slate-500 mb-3">
-                                        {selectedMaterial?.code ?? riskData.material_code}
+                                        {selectedMaterial?.material_code ?? riskData.material_code}
                                     </div>
                                     <RiskBadge label={riskData.risk_label} score={riskData.risk_score} />
                                 </div>
